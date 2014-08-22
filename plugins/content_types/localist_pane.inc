@@ -5,23 +5,35 @@
  */
 
 $plugin = array(
-"single" => TRUE, // Just do this one, it is needed.
-"title" => t("Localist"), // Title to show up on the pane screen.
-"description" => t("Pane with localist data"), // Description to show up on the pane screen.
-"category" => t("Localist"), // A category to put this under.
-"edit form" => "localist_pane_edit_form", // A function that will return the settings form for the pane.
-"render callback" => "localist_pane_render", // A function that will return the renderable content.
-"admin info" => "localist_pane_admin_info", // A function that will return the information displayed on the admin screen (optional).
-"defaults" => array( // Array of defaults for the settings form.
-"text" => "",
-),
-"all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
+  "single" => TRUE, // Just do this one, it is needed.
+  "title" => t("Localist"), // Title to show up on the pane screen.
+  "description" => t("Pane with localist data"), // Description to show up on the pane screen.
+  "category" => t("Localist"), // A category to put this under.
+  "edit form" => "localist_pane_edit_form", // A function that will return the settings form for the pane.
+  "render callback" => "localist_pane_render", // A function that will return the renderable content.
+  "admin info" => "localist_pane_admin_info", // A function that will return the information displayed on the admin screen (optional).
+  "defaults" => array( // Array of defaults for the settings form.
+    "widget_type" => "view",
+    "number_results" => "5",
+    "days_ahead" => "31",
+    "featured" => 0,
+    "sponsored" => 0,
+    "matching_instances" => 0,
+    "venues" => "",
+    "match" => "",
+    "hidedesc" => 0,
+    "hideimage" => 0,
+    "show_times" => 1,
+  ),
+  "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
 );
 
 function localist_pane_admin_info($subtype, $conf, $contexts) {
-  $block = new stdClass();
-  $block->title = t("Localist");
-  return $block;
+  if (!empty($conf)) {
+    $block = new stdClass();
+    $block->title = t("Localist");
+    return $block;
+  }
 }
 
 /**
@@ -33,50 +45,85 @@ function localist_pane_edit_form($form, &$form_state) {
   $form["widget_type"] = array(
     "#type" => "select",
     "#title" => t("Widget Type"),
+    "#default_value" => $conf["widget_type"],
     "#options" => array(
       "view" => t("List"),
       "combo" => t("Mini-Calendar + List"),
     ),
-    "#default_value" => isset($conf["widget_type"]) ? $conf["widget_type"] : "",
   );
 
   $form["number_results"] = array(
     "#type" => "textfield",
-    "#title" => t("Number of Results?"),
-    "#description" => t("Number of events to grab"),
-    "#default_value" => isset($conf["number_results"]) ? $conf["number_results"] : "",
+    "#title" => t("Number of Results"),
+    "#description" => t("Number of events to display. Maxinimum of 50."),
+    "#default_value" => $conf["number_results"],
   );
 
   $form["days_ahead"] = array(
     "#type" => "textfield",
-    "#title" => t("Days Ahead?"),
-    "#default_value" => isset($conf["days_ahead"]) ? $conf["days_ahead"] : "",
+    "#title" => t("Days Ahead"),
+    "#description" => t("Number of days in the future from which to display events. Maximum of 365."),
+    "#default_value" => $conf["days_ahead"],
   );
 
   $form["featured"] = array(
     "#type" => "checkbox",
     "#title" => t("Only show Featured Events"),
-    "#default_value" => isset($conf["featured"]) ? $conf["featured"] : 0,
+    "#default_value" => $conf["featured"],
   );
 
   $form["sponsored"] = array(
     "#type" => "checkbox",
     "#title" => t("Only Show Sponsored Events"),
-    "#default_value" => isset($conf["sponsored"]) ? $conf["sponsored"] : 0,
+    "#default_value" => $conf["sponsored"],
   );
 
   $form["matching_instances"] = array(
     "#type" => "checkbox",
     "#title" => t("Include All Matching Instances"),
-    "#default_value" => isset($conf["matching_instances"]) ? $conf["matching_instances"] : 0,
+    "#default_value" => $conf["matching_instances"],
   );
 
-  $form["places"] = array(
+  $form["venues"] = array(
     "#type" => "select",
-    "#title" => t("Calendar ID"),
-    "#description" => t("ID of the Calendar to pull events from"),
-    "#default_value" => isset($conf["places"]) ? $conf["places"] : "",
+    "#title" => t("Places"),
+    "#multiple" => TRUE,
+    "#default_value" => $conf["venues"],
     "#options" => localist_pane_get_places(),
+  );
+
+  $form["match"] = array(
+    "#type" => "select",
+    "#title" => t("Match"),
+    "#default_value" => $conf["match"],
+    "#options" => array(
+      "" => "At least one keyword or tag, and one filter item",
+      "any" => "Any keyword, tag, or filter item",
+      "all" => "All keywords, tags, and filter items",
+    ),
+  );
+
+  $form["output"] = array(
+    "#type" => "fieldset",
+    "#title" => t("Output"),
+  );
+
+  $form["output"]["hidedesc"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Hide Descriptions"),
+    "#default_value" => $form_state["conf"]["hidedesc"],
+  );
+
+  $form["output"]["hideimage"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Hide Event Image"),
+    "#default_value" => $form_state["conf"]["hideimage"],
+  );
+
+  $form["output"]["show_times"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Show Event Times"),
+    "#default_value" => $form_state["conf"]["show_times"],
   );
 
   return $form;
@@ -84,15 +131,56 @@ function localist_pane_edit_form($form, &$form_state) {
 
 function localist_pane_edit_form_submit(&$form, &$form_state) {
   // Puts all values in the $conf array.
-  foreach (array("calendar_id") as $key) {
-    $form_state["conf"][$key] = $form_state["values"][$key];
+  foreach (array_keys($form_state['plugin']['defaults']) as $key) {
+    if (isset($form_state['values'][$key])) {
+      $form_state['conf'][$key] = $form_state['values'][$key];
+    }
   }
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
+  $src_url = "http://events.uiowa.edu/widget/" . $conf["widget_type"] . "?schools=iowa&style=none";
+
+  $localist_args = array(
+    "number_results", 
+    "days_ahead", 
+    "featured", 
+    "sponsored", 
+    "matching_instances", 
+    "venues", 
+    "match", 
+    "hidedesc", 
+    "hideimage", 
+    "show_times",
+  );
+
+  foreach ($localist_args as $arg) {
+    if (!empty($conf[$arg])) {
+      if (is_array($conf[$arg])) {
+        $src_url .= "&" . $arg . "=" . implode('%2C', $conf[$arg]);
+      } else {
+        $src_url .= "&" . $arg . "=" . $conf[$arg];
+      }
+    }
+  }
+
+
+  // https://api.drupal.org/api/drupal/includes!theme.inc/function/theme_html_tag/7
+  $content = array(
+    "#theme" => "html_tag",
+    "#tag" => "script",
+    "#value" => "",
+    "#attributes" => array(
+      "type" => "text/javascript",
+      "src" => $src_url,
+    ),
+  );
+
   $block = new stdClass();
-  $block->title = $conf["title"];
-  $block->content = array();
+  $block->title = 'Events'; // The title may be overridden by the user within the panel options.
+  $block->content = $content; // The inital content is blank.
+
+  return $block;
 }
 
 function localist_pane_get_places() {
