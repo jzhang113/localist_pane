@@ -139,7 +139,7 @@ function localist_pane_edit_form_submit(&$form, &$form_state) {
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
-  $src_url = "http://events.uiowa.edu/widget/" . $conf["widget_type"] . "?schools=iowa&style=none";
+  $src_url = "http://events.uiowa.edu/widget/" . $conf["widget_type"] . "?schools=iowa&style=none&html_descriptions=1";
 
   $localist_args = array(
     "number_results", 
