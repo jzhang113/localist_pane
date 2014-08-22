@@ -2,3 +2,4 @@ name = "Localist Pane"
 description = "Ctools content type for Localist Widget Builder"
 core = 7.x
 
+scripts[] = js/localist_pane.js
