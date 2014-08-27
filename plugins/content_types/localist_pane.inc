@@ -24,6 +24,7 @@ $plugin = array(
     "hidedesc" => 0,
     "hideimage" => 0,
     "show_times" => 1,
+    "tags" => "",
   ),
   "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
 );
@@ -64,6 +65,13 @@ function localist_pane_edit_form($form, &$form_state) {
     "#title" => t("Days Ahead"),
     "#description" => t("Number of days in the future from which to display events. Maximum of 365."),
     "#default_value" => $conf["days_ahead"],
+  );
+
+  $form["tags"] = array(
+    "#type" => "textfield",
+    "#title" => t("Keywords and Tags"),
+    "#description" => t("Separate keywords with commas."),
+    "#default_value" => $conf["tags"],
   );
 
   $form["featured"] = array(
@@ -143,7 +151,8 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 
   $localist_args = array(
     "number_results", 
-    "days_ahead", 
+    "days_ahead",
+    "tags",
     "featured", 
     "sponsored", 
     "matching_instances", 
@@ -156,10 +165,16 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 
   foreach ($localist_args as $arg) {
     if (!empty($conf[$arg])) {
-      if (is_array($conf[$arg])) {
-        $src_url .= "&" . $arg . "=" . implode('%2C', $conf[$arg]);
-      } else {
-        $src_url .= "&" . $arg . "=" . $conf[$arg];
+      switch ($arg) {
+        case "tags":
+          $src_url .= "&" . $arg . "=" . str_replace(array(',', ', '), '%2C', check_plain($conf[$arg]));
+          break;
+        case "venues":
+          $src_url .= "&" . $arg . "=" . implode('%2C', $conf[$arg]);
+          break;
+        default:
+          $src_url .= "&" . $arg . "=" . $conf[$arg];
+          break;
       }
     }
   }
