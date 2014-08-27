@@ -23,6 +23,7 @@ $plugin = array(
     "match" => "",
     "hidedesc" => 0,
     "hideimage" => 0,
+    "image_size" => "",
     "show_times" => 1,
     "tags" => "",
   ),
@@ -128,6 +129,25 @@ function localist_pane_edit_form($form, &$form_state) {
     "#default_value" => $form_state["conf"]["hideimage"],
   );
 
+  $form["output"]["image_size"]  = array(
+    "#type" => "select",
+    "#title" => t("Image Size"),
+    "#options" => array(
+      "tiny" => "Tiny (20x20)",
+      "" => "Small (50x50)",
+      "medium" => "Medium (80x80)",
+      "big" => "Big (200x150)",
+      "big_300" => "Large (300x225)",
+    ),
+    "#default_value" => $form_state["conf"]["image_size"],
+    "#states" => array(
+      // Hide the setting when the Hide Event Image checkbox is checked.
+      "invisible" => array(
+        ':input[name="hideimage"]' => array("checked" => TRUE),
+      ),
+    ),
+  );
+
   $form["output"]["show_times"] = array(
     "#type" => "checkbox",
     "#title" => t("Show Event Times"),
@@ -159,7 +179,8 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     "venues", 
     "match", 
     "hidedesc", 
-    "hideimage", 
+    "hideimage",
+    "image_size",
     "show_times",
   );
 
