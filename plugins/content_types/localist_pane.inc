@@ -13,7 +13,6 @@ $plugin = array(
   "render callback" => "localist_pane_render", // A function that will return the renderable content.
   "admin info" => "localist_pane_admin_info", // A function that will return the information displayed on the admin screen (optional).
   "defaults" => array( // Array of defaults for the settings form.
-    "widget_type" => "view",
     "number_results" => "5",
     "days_ahead" => "31",
     "featured" => 0,
@@ -43,16 +42,6 @@ function localist_pane_admin_info($subtype, $conf, $contexts) {
  */
 function localist_pane_edit_form($form, &$form_state) {
   $conf = $form_state["conf"];
-
-  $form["widget_type"] = array(
-    "#type" => "select",
-    "#title" => t("Widget Type"),
-    "#default_value" => $conf["widget_type"],
-    "#options" => array(
-      "view" => t("List"),
-      "combo" => t("Mini-Calendar + List"),
-    ),
-  );
 
   $form["number_results"] = array(
     "#type" => "textfield",
@@ -167,7 +156,7 @@ function localist_pane_edit_form_submit(&$form, &$form_state) {
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
-  $src_url = "http://events.uiowa.edu/widget/" . $conf["widget_type"] . "?schools=iowa&style=none&html_descriptions=1";
+  $src_url = "http://events.uiowa.edu/widget/view?schools=iowa&style=none&html_descriptions=1";
 
   $localist_args = array(
     "number_results", 
