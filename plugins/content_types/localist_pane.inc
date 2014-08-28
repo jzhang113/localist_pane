@@ -23,7 +23,7 @@ $plugin = array(
     "hidedesc" => 0,
     "hideimage" => 0,
     "image_size" => "",
-    "show_times" => 1,
+    "show_times" => 0,
     "tags" => "",
   ),
   "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
