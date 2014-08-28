@@ -139,7 +139,7 @@ function localist_pane_edit_form($form, &$form_state) {
 
   $form["output"]["show_times"] = array(
     "#type" => "checkbox",
-    "#title" => t("Show Event Times"),
+    "#title" => t("Hide Event Times"),
     "#default_value" => $form_state["conf"]["show_times"],
   );
 
@@ -182,13 +182,15 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
         case "venues":
           $src_url .= "&" . $arg . "=" . implode('%2C', $conf[$arg]);
           break;
+        case "show_times":
+          $src_url .= "&show_times=0";
+          break;
         default:
           $src_url .= "&" . $arg . "=" . $conf[$arg];
           break;
       }
     }
   }
-
 
   // https://api.drupal.org/api/drupal/includes!theme.inc/function/theme_html_tag/7
   $content = array(
