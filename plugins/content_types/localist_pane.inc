@@ -13,8 +13,8 @@ $plugin = array(
   "render callback" => "localist_pane_render", // A function that will return the renderable content.
   "admin info" => "localist_pane_admin_info", // A function that will return the information displayed on the admin screen (optional).
   "defaults" => array( // Array of defaults for the settings form.
-    "number_results" => "5",
-    "days_ahead" => "31",
+    "num" => "5",
+    "days" => "31",
     "featured" => 0,
     "sponsored" => 0,
     "matching_instances" => 0,
@@ -25,6 +25,10 @@ $plugin = array(
     "image_size" => "",
     "show_times" => 0,
     "tags" => "",
+    "departments" => "",
+    "event_types" => "",
+    "audience" => "",
+    "general_interest" => "",
   ),
   "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
 );
@@ -43,18 +47,18 @@ function localist_pane_admin_info($subtype, $conf, $contexts) {
 function localist_pane_edit_form($form, &$form_state) {
   $conf = $form_state["conf"];
 
-  $form["number_results"] = array(
+  $form["num"] = array(
     "#type" => "textfield",
     "#title" => t("Number of Results"),
     "#description" => t("Number of events to display. Maxinimum of 50."),
-    "#default_value" => $conf["number_results"],
+    "#default_value" => $conf["num"],
   );
 
-  $form["days_ahead"] = array(
+  $form["days"] = array(
     "#type" => "textfield",
     "#title" => t("Days Ahead"),
     "#description" => t("Number of days in the future from which to display events. Maximum of 365."),
-    "#default_value" => $conf["days_ahead"],
+    "#default_value" => $conf["days"],
   );
 
   $form["tags"] = array(
@@ -143,6 +147,7 @@ function localist_pane_edit_form($form, &$form_state) {
     "#default_value" => $form_state["conf"]["show_times"],
   );
 
+  // Grab the all the filters.
   $filters = localist_pane_get_filters();
 
   $form["event_types"] = array(
@@ -187,14 +192,24 @@ function localist_pane_edit_form_submit(&$form, &$form_state) {
       $form_state['conf'][$key] = $form_state['values'][$key];
     }
   }
+  // Combine all filters into one array.
+  $types = array_merge(
+    $form_state["conf"]["departments"],
+    $form_state["conf"]["event_types"],
+    $form_state["conf"]["audience"],
+    $form_state["conf"]["general_interest"]
+  );
+
+
+  $form_state["conf"]["types"] = implode("%2C", $types);
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
   $src_url = "http://events.uiowa.edu/widget/view?schools=iowa&style=none&html_descriptions=1";
 
   $localist_args = array(
-    "number_results",
-    "days_ahead",
+    "num",
+    "days",
     "tags",
     "featured",
     "sponsored",
@@ -205,6 +220,7 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     "hideimage",
     "image_size",
     "show_times",
+    "types",
   );
 
   foreach ($localist_args as $arg) {
@@ -237,6 +253,7 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     ),
   );
 
+  dpm($src_url);
   $block = new stdClass();
   $block->title = 'Events'; // The title may be overridden by the user within the panel options.
   $block->content = $content; // The inital content is blank.
