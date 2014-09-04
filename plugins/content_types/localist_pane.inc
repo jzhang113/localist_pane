@@ -143,6 +143,40 @@ function localist_pane_edit_form($form, &$form_state) {
     "#default_value" => $form_state["conf"]["show_times"],
   );
 
+  $filters = localist_pane_get_filters();
+
+  $form["event_types"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Event Types"),
+    "#default_value" => $form_state["conf"]["event_types"],
+    "#options" => $filters["event_types"],
+  );
+
+  $form["departments"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Department"),
+    "#default_value" => $form_state["conf"]["departments"],
+    "#options" => $filters["departments"],
+  );
+
+  $form["audience"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Audience"),
+    "#default_value" => $form_state["conf"]["audience"],
+    "#options" => $filters["event_audience"],
+  );
+
+  $form["general_interest"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("General Interest"),
+    "#default_value" => $form_state["conf"]["general_interest"],
+    "#options" => $filters["event_general_interest"],
+  );
+
   return $form;
 }
 
@@ -159,15 +193,15 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
   $src_url = "http://events.uiowa.edu/widget/view?schools=iowa&style=none&html_descriptions=1";
 
   $localist_args = array(
-    "number_results", 
+    "number_results",
     "days_ahead",
     "tags",
-    "featured", 
-    "sponsored", 
-    "matching_instances", 
-    "venues", 
-    "match", 
-    "hidedesc", 
+    "featured",
+    "sponsored",
+    "matching_instances",
+    "venues",
+    "match",
+    "hidedesc",
     "hideimage",
     "image_size",
     "show_times",
@@ -244,4 +278,28 @@ function localist_pane_get_places() {
     $select_list_data[$place["place"]["urlname"]] = $place["place"]["name"];
   }
   return $select_list_data;
+}
+
+
+function localist_pane_get_filters() {
+  $url = "http://events.uiowa.edu/api/2/events/filters";
+  // Open up a cURL channel.
+  $ch = curl_init($url);
+  // Tell cURL to return the data as a string rather than print to the screen.
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  // Decode the JSON string returned by cURL into an associative array.
+  $results = json_decode(curl_exec($ch), true);
+  curl_close($ch);
+  $query_data = array();
+  // Sadly, nested for loops are necessary here since we need
+  // a handle on each filter grouping (Department, event types, etc.)
+  foreach ($results as $result => $items) {
+    $query_data[$result] = array();
+    foreach ($items as $item) {
+      // Add each filter term to its group, using the terms ID as the key
+      // and the name as the value.
+      $query_data[$result][$item["id"]] = $item["name"];
+    }
+  }
+  return $query_data;
 }
