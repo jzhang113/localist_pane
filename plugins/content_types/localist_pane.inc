@@ -70,7 +70,7 @@ function localist_pane_edit_form($form, &$form_state) {
 
   $form["featured"] = array(
     "#type" => "checkbox",
-    "#title" => t("Only show Featured Events"),
+    "#title" => t("Only Show Featured Events"),
     "#default_value" => $conf["featured"],
   );
 
