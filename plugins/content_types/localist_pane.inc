@@ -253,7 +253,6 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     ),
   );
 
-  dpm($src_url);
   $block = new stdClass();
   $block->title = 'Events'; // The title may be overridden by the user within the panel options.
   $block->content = $content; // The inital content is blank.
