@@ -6,9 +6,9 @@
 
 $plugin = array(
   "single" => TRUE, // Just do this one, it is needed.
-  "title" => t("Localist"), // Title to show up on the pane screen.
-  "description" => t("Pane with localist data"), // Description to show up on the pane screen.
-  "category" => t("Localist"), // A category to put this under.
+  "title" => t("Localist Events Pane"), // Title to show up on the pane screen.
+  "description" => t("A list of events from Localist"), // Description to show up on the pane screen.
+  "category" => t("Localist Events"), // A category to put this under.
   "edit form" => "localist_pane_edit_form", // A function that will return the settings form for the pane.
   "render callback" => "localist_pane_render", // A function that will return the renderable content.
   "admin info" => "localist_pane_admin_info", // A function that will return the information displayed on the admin screen (optional).
@@ -36,7 +36,7 @@ $plugin = array(
 function localist_pane_admin_info($subtype, $conf, $contexts) {
   if (!empty($conf)) {
     $block = new stdClass();
-    $block->title = t("Localist");
+    $block->title = t("Localist Pane");
     return $block;
   }
 }
