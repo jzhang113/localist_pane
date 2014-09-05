@@ -262,26 +262,17 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 
 function localist_pane_get_places() {
   $url = "http://events.uiowa.edu/api/2/places?pp=100";
-  // Open up a cURL channel.
-  $ch = curl_init($url);
-  // Tell cURL to return the data as a string rather than print to the screen.
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  // Decode the JSON string returned by cURL into an associative array.
-  $result = json_decode(curl_exec($ch), true);
-  // Save the data we got back from the first page
-  $places_data = $result["places"];
-  curl_close($ch);
+  // Grab the JSON decoded data.
+  $results = _localist_pane_decode($url);
+  // Get the places array.
+  $places_data = $results["places"];
 
   // Initialize the page number and the URL for the second page.
   $page_number = 2;
   $url = $url . "&page=2";
-  // cURL and loop through all the pages, combining the data until we're out of
-  // pages.
+  // Loop through all the pages, combining the data until we're out of pages.
   while ($page_number <= $result["page"]["total"]) {
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $results = json_decode(curl_exec($ch), true);
-    curl_close($ch);
+    $results = _localist_pane_decode($url);
     $places_data = array_merge($places_data, $results["places"]);
     $page_number++;
     $url = "http://events.uiowa.edu/api/2/places?pp=100&page=" . strval($page_number);
@@ -299,13 +290,7 @@ function localist_pane_get_places() {
 
 function localist_pane_get_filters() {
   $url = "http://events.uiowa.edu/api/2/events/filters";
-  // Open up a cURL channel.
-  $ch = curl_init($url);
-  // Tell cURL to return the data as a string rather than print to the screen.
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  // Decode the JSON string returned by cURL into an associative array.
-  $results = json_decode(curl_exec($ch), true);
-  curl_close($ch);
+  $results = _localist_pane_decode($url);
   $query_data = array();
   // Sadly, nested for loops are necessary here since we need
   // a handle on each filter grouping (Department, event types, etc.)
