@@ -172,16 +172,16 @@ function localist_pane_edit_form($form, &$form_state) {
     "#default_value" => $form_state["conf"]["hidedesc"],
   );
 
-  $form["output"]["hideimage"] = array(
-    "#type" => "checkbox",
-    "#title" => t("Hide Event Image"),
-    "#default_value" => $form_state["conf"]["hideimage"],
-  );
-
   $form["output"]["show_times"] = array(
     "#type" => "checkbox",
     "#title" => t("Hide Event Times"),
     "#default_value" => $form_state["conf"]["show_times"],
+  );
+
+  $form["output"]["hideimage"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Hide Event Image"),
+    "#default_value" => $form_state["conf"]["hideimage"],
   );
 
   $form["output"]["image_size"]  = array(
@@ -202,8 +202,6 @@ function localist_pane_edit_form($form, &$form_state) {
       ),
     ),
   );
-
-
 
   return $form;
 }
