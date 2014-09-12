@@ -61,40 +61,14 @@ function localist_pane_edit_form($form, &$form_state) {
     "#default_value" => $conf["days"],
   );
 
-  $form["tags"] = array(
-    "#type" => "textfield",
-    "#title" => t("Keywords and Tags"),
-    "#description" => t("Separate keywords with commas."),
-    "#default_value" => $conf["tags"],
+  $form["filter_events"] = array(
+    "#type" => "fieldset",
+    "#title" => t("Filter Events"),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
   );
 
-  $form["featured"] = array(
-    "#type" => "checkbox",
-    "#title" => t("Only Show Featured Events"),
-    "#default_value" => $conf["featured"],
-  );
-
-  $form["sponsored"] = array(
-    "#type" => "checkbox",
-    "#title" => t("Only Show Sponsored Events"),
-    "#default_value" => $conf["sponsored"],
-  );
-
-  $form["matching_instances"] = array(
-    "#type" => "checkbox",
-    "#title" => t("Include All Matching Instances"),
-    "#default_value" => $conf["matching_instances"],
-  );
-
-  $form["venues"] = array(
-    "#type" => "select",
-    "#title" => t("Places"),
-    "#multiple" => TRUE,
-    "#default_value" => $conf["venues"],
-    "#options" => localist_pane_get_places(),
-  );
-
-  $form["match"] = array(
+  $form["filter_events"]["match"] = array(
     "#type" => "select",
     "#title" => t("Match"),
     "#default_value" => $conf["match"],
@@ -105,9 +79,91 @@ function localist_pane_edit_form($form, &$form_state) {
     ),
   );
 
+    $form["filter_events"]["featured"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Only Show Featured Events"),
+    "#default_value" => $conf["featured"],
+  );
+
+  $form["filter_events"]["sponsored"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Only Show Sponsored Events"),
+    "#default_value" => $conf["sponsored"],
+  );
+
+  $form["filter_events"]["matching_instances"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Include All Matching Instances"),
+    "#default_value" => $conf["matching_instances"],
+  );
+
+  $form["filter_events"]["tags"] = array(
+    "#type" => "textfield",
+    "#title" => t("Keywords and Tags"),
+    "#description" => t("Separate keywords with commas."),
+    "#default_value" => $conf["tags"],
+  );
+
+  // Grab the all the filters.
+  $filters = localist_pane_get_filters();
+
+  $form["filter_events"]["filter_events_filters"] = array(
+    "#type" => "fieldset",
+    "#title" => t("Filters"),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form["filter_events"]["filter_events_filters"]["event_types"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Event Types"),
+    "#default_value" => $form_state["conf"]["event_types"],
+    "#options" => $filters["event_types"],
+    '#size'=> 7,
+  );
+
+  $form["filter_events"]["filter_events_filters"]["departments"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Department"),
+    "#default_value" => $form_state["conf"]["departments"],
+    "#options" => $filters["departments"],
+    '#size'=> 10,
+  );
+
+  $form["filter_events"]["filter_events_filters"]["audience"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Audience"),
+    "#default_value" => $form_state["conf"]["audience"],
+    "#options" => $filters["event_audience"],
+    '#size'=> 6,
+  );
+
+  $form["filter_events"]["filter_events_filters"]["general_interest"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("General Interest"),
+    "#default_value" => $form_state["conf"]["general_interest"],
+    "#options" => $filters["event_general_interest"],
+    '#size'=> 7,
+  );
+
+  $form["filter_events"]["filter_events_filters"]["venues"] = array(
+    "#type" => "select",
+    "#title" => t("Places"),
+    "#multiple" => TRUE,
+    "#default_value" => $conf["venues"],
+    "#options" => localist_pane_get_places(),
+    '#size'=> 10,
+  );
+
   $form["output"] = array(
     "#type" => "fieldset",
     "#title" => t("Output"),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
   );
 
   $form["output"]["hidedesc"] = array(
@@ -120,6 +176,12 @@ function localist_pane_edit_form($form, &$form_state) {
     "#type" => "checkbox",
     "#title" => t("Hide Event Image"),
     "#default_value" => $form_state["conf"]["hideimage"],
+  );
+
+  $form["output"]["show_times"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Hide Event Times"),
+    "#default_value" => $form_state["conf"]["show_times"],
   );
 
   $form["output"]["image_size"]  = array(
@@ -141,46 +203,7 @@ function localist_pane_edit_form($form, &$form_state) {
     ),
   );
 
-  $form["output"]["show_times"] = array(
-    "#type" => "checkbox",
-    "#title" => t("Hide Event Times"),
-    "#default_value" => $form_state["conf"]["show_times"],
-  );
 
-  // Grab the all the filters.
-  $filters = localist_pane_get_filters();
-
-  $form["event_types"] = array(
-    "#type" => "select",
-    "#multiple" => TRUE,
-    "#title" => t("Event Types"),
-    "#default_value" => $form_state["conf"]["event_types"],
-    "#options" => $filters["event_types"],
-  );
-
-  $form["departments"] = array(
-    "#type" => "select",
-    "#multiple" => TRUE,
-    "#title" => t("Department"),
-    "#default_value" => $form_state["conf"]["departments"],
-    "#options" => $filters["departments"],
-  );
-
-  $form["audience"] = array(
-    "#type" => "select",
-    "#multiple" => TRUE,
-    "#title" => t("Audience"),
-    "#default_value" => $form_state["conf"]["audience"],
-    "#options" => $filters["event_audience"],
-  );
-
-  $form["general_interest"] = array(
-    "#type" => "select",
-    "#multiple" => TRUE,
-    "#title" => t("General Interest"),
-    "#default_value" => $form_state["conf"]["general_interest"],
-    "#options" => $filters["event_general_interest"],
-  );
 
   return $form;
 }
