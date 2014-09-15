@@ -322,6 +322,8 @@ function localist_pane_get_filters() {
       // and the name as the value.
       $query_data[$result][$item["id"]] = $item["name"];
     }
+    // Order the filter terms in each group alphabetically.
+    asort($query_data[$result]);
   }
   return $query_data;
 }
