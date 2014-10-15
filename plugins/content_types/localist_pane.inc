@@ -292,7 +292,7 @@ function localist_pane_get_places() {
   $page_number = 2;
   $url = $url . "&page=2";
   // Loop through all the pages, combining the data until we're out of pages.
-  while ($page_number <= $result["page"]["total"]) {
+  while ($page_number <= $results["page"]["total"]) {
     $results = _localist_pane_decode($url);
     $places_data = array_merge($places_data, $results["places"]);
     $page_number++;
@@ -313,8 +313,7 @@ function localist_pane_get_filters() {
   $url = "http://events.uiowa.edu/api/2/events/filters";
   $results = _localist_pane_decode($url);
   $query_data = array();
-  // Sadly, nested for loops are necessary here since we need
-  // a handle on each filter grouping (Department, event types, etc.)
+  // Get a handle on each filter grouping (Department, event types, etc.)
   foreach ($results as $result => $items) {
     $query_data[$result] = array();
     foreach ($items as $item) {
@@ -322,6 +321,8 @@ function localist_pane_get_filters() {
       // and the name as the value.
       $query_data[$result][$item["id"]] = $item["name"];
     }
+    // Order the filter terms in each group alphabetically.
+    asort($query_data[$result]);
   }
   return $query_data;
 }
