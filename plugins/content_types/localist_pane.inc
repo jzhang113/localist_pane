@@ -265,12 +265,14 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 
   // https://api.drupal.org/api/drupal/includes!theme.inc/function/theme_html_tag/7
   $content = array(
-    "#theme" => "html_tag",
-    "#tag" => "script",
-    "#value" => "",
-    "#attributes" => array(
-      "type" => "text/javascript",
-      "src" => $src_url,
+    "events" => array(
+      "#theme" => "html_tag",
+      "#tag" => "script",
+      "#value" => "",
+      "#attributes" => array(
+        "type" => "text/javascript",
+        "src" => $src_url,
+      ),
     ),
   );
 
