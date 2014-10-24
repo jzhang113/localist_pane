@@ -15,7 +15,7 @@ $plugin = array(
   "defaults" => array( // Array of defaults for the settings form.
     "num" => "5",
     "days" => "31",
-    "featured" => 0,
+    "picks" => 0,
     "sponsored" => 0,
     "matching_instances" => 0,
     "venues" => "",
@@ -82,10 +82,11 @@ function localist_pane_edit_form($form, &$form_state) {
     ),
   );
 
-  $form["filter_events"]["featured"] = array(
+  // Widget builder needs "picks" rather than "featured" for the key
+  $form["filter_events"]["picks"] = array(
     "#type" => "checkbox",
     "#title" => t("Only Show Featured Events"),
-    "#default_value" => $conf["featured"],
+    "#default_value" => $conf["picks"],
   );
 
   $form["filter_events"]["sponsored"] = array(
@@ -268,7 +269,7 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     "num",
     "days",
     "tags",
-    "featured",
+    "picks",
     "sponsored",
     "matching_instances",
     "venues",
