@@ -292,6 +292,9 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
         case "show_times":
           $src_url .= "&show_times=0";
           break;
+        case "featured":
+          $src_url .= "&picks=1";
+          break;
         default:
           $src_url .= "&" . $arg . "=" . $conf[$arg];
           break;
