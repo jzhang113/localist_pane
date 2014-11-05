@@ -29,6 +29,9 @@ $plugin = array(
     "event_types" => "",
     "audience" => "",
     "general_interest" => "",
+    "more" => 0,
+    "moretext" => "more",
+    "moreurl" => "http://events.uiowa.edu",
   ),
   "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
 );
@@ -79,7 +82,7 @@ function localist_pane_edit_form($form, &$form_state) {
     ),
   );
 
-    $form["filter_events"]["featured"] = array(
+  $form["filter_events"]["featured"] = array(
     "#type" => "checkbox",
     "#title" => t("Only Show Featured Events"),
     "#default_value" => $conf["featured"],
@@ -203,6 +206,39 @@ function localist_pane_edit_form($form, &$form_state) {
     ),
   );
 
+  $form["output"]["more"] = array(
+    "#type" => "checkbox",
+    "#title" => t("Display a more link"),
+    "#description" => t("Add a link to a list of more events."),
+    "#default_value" => $form_state["conf"]["more"],
+  );
+
+  $form["output"]["moretext"] = array(
+    "#type" => "textfield",
+    "#title" => t("Link text"),
+    "#description" => t("The text shown that the user will click on."),
+    "#default_value" => $form_state["conf"]["moretext"],
+    "#states" => array(
+      // Hide the setting when the More Link checkbox is not checked.
+      "invisible" => array(
+        ':input[name="more"]' => array("checked" => FALSE),
+      ),
+    ),
+  );
+
+  $form["output"]["moreurl"] = array(
+    "#type" => "textfield",
+    "#title" => t("Link url"),
+    "#description" => t("The link location. Usually to a filter landing page on http://events.uiowa.edu"),
+    "#default_value" => $form_state["conf"]["moreurl"],
+    "#states" => array(
+      // Hide the setting when the More Link checkbox is not checked.
+      "invisible" => array(
+        ':input[name="more"]' => array("checked" => FALSE),
+      ),
+    ),
+  );
+
   return $form;
 }
 
@@ -256,6 +292,9 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
         case "show_times":
           $src_url .= "&show_times=0";
           break;
+        case "featured":
+          $src_url .= "&picks=1";
+          break;
         default:
           $src_url .= "&" . $arg . "=" . $conf[$arg];
           break;
@@ -265,14 +304,28 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 
   // https://api.drupal.org/api/drupal/includes!theme.inc/function/theme_html_tag/7
   $content = array(
-    "#theme" => "html_tag",
-    "#tag" => "script",
-    "#value" => "",
-    "#attributes" => array(
-      "type" => "text/javascript",
-      "src" => $src_url,
+    "events" => array(
+      "#theme" => "html_tag",
+      "#tag" => "script",
+      "#value" => "",
+      "#attributes" => array(
+        "type" => "text/javascript",
+        "src" => $src_url,
+      ),
     ),
   );
+
+  if(!empty($conf["more"])) {
+    // Provide a more link.
+    $content['more'] = array(
+      "#type" => 'link',
+      "#title" => $conf["moretext"],
+      "#href" => $conf["moreurl"],
+      "#options" => array(
+        "attributes" => array("class" => array("more-link")),
+      ),
+    );
+  }
 
   $block = new stdClass();
   $block->title = 'Events'; // The title may be overridden by the user within the panel options.
