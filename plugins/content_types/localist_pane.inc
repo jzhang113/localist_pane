@@ -29,6 +29,10 @@ $plugin = array(
     "event_types" => "",
     "audience" => "",
     "general_interest" => "",
+    "exclude_event_types" => "",
+    "exclude_departments" => "",
+    "exclude_audience" => "",
+    "exclude_general_interest" => "",
     "more" => 0,
     "moretext" => "more",
     "moreurl" => "http://events.uiowa.edu",
@@ -162,6 +166,49 @@ function localist_pane_edit_form($form, &$form_state) {
     '#size'=> 10,
   );
 
+  $form["excluded_content"] = array(
+    "#type" => "fieldset",
+    "#title" => t("Excluded Content"),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  $form["excluded_content"]["exclude_event_types"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Event Types"),
+    "#default_value" => $conf["exclude_event_types"],
+    "#options" => $filters["event_types"],
+    '#size'=> 7,
+  );
+
+  $form["excluded_content"]["exclude_departments"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Department"),
+    "#default_value" => $conf["exclude_departments"],
+    "#options" => $filters["departments"],
+    '#size'=> 10,
+  );
+
+  $form["excluded_content"]["exclude_audience"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("Audience"),
+    "#default_value" => $conf["exclude_audience"],
+    "#options" => $filters["event_audience"],
+    '#size'=> 6,
+  );
+
+  $form["excluded_content"]["exclude_general_interest"] = array(
+    "#type" => "select",
+    "#multiple" => TRUE,
+    "#title" => t("General Interest"),
+    "#default_value" => $conf["exclude_general_interest"],
+    "#options" => $filters["event_general_interest"],
+    '#size'=> 7,
+  );
+
   $form["output"] = array(
     "#type" => "fieldset",
     "#title" => t("Output"),
@@ -257,8 +304,16 @@ function localist_pane_edit_form_submit(&$form, &$form_state) {
     $form_state["conf"]["general_interest"]
   );
 
-
   $form_state["conf"]["types"] = implode("%2C", $types);
+
+  $excluded = array_merge(
+    $form_state["conf"]["exclude_event_types"],
+    $form_state["conf"]["exclude_departments"],
+    $form_state["conf"]["exclude_audience"],
+    $form_state["conf"]["exclude_general_interest"]
+  );
+
+  $form_state["conf"]["exclude_types"] = implode("%2C", $excluded);
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
@@ -278,6 +333,7 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     "image_size",
     "show_times",
     "types",
+    "exclude_types",
   );
 
   foreach ($localist_args as $arg) {
