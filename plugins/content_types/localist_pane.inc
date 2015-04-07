@@ -375,11 +375,10 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
     // Provide a more link.
     $content['more'] = array(
       "#type" => 'link',
+      "#prefix" => '<div class="more-link">',
       "#title" => $conf["moretext"],
       "#href" => $conf["moreurl"],
-      "#options" => array(
-        "attributes" => array("class" => array("more-link")),
-      ),
+      "#suffix" => '</div>',
     );
   }
 
