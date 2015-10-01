@@ -1,0 +1,8 @@
+{
+    "name": "its-uofiowa/localist_pane",
+    "description": "Ctools content type for Localist Widget Builder.",
+    "type": "drupal-module",
+    "require": {
+      "composer/installers": "*"
+    }
+}
