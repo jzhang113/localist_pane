@@ -35,7 +35,7 @@ $plugin = array(
     "exclude_general_interest" => "",
     "more" => 0,
     "moretext" => "more",
-    "moreurl" => "http://events.uiowa.edu",
+    "moreurl" => "https://events.uiowa.edu",
   ),
   "all contexts" => TRUE, // This is NEEDED to be able to use substitution strings in your pane.
 );
@@ -276,7 +276,7 @@ function localist_pane_edit_form($form, &$form_state) {
   $form["output"]["moreurl"] = array(
     "#type" => "textfield",
     "#title" => t("Link url"),
-    "#description" => t("The link location. Usually to a filter landing page on http://events.uiowa.edu"),
+    "#description" => t("The link location. Usually to a filter landing page on https://events.uiowa.edu"),
     "#default_value" => $form_state["conf"]["moreurl"],
     "#states" => array(
       // Hide the setting when the More Link checkbox is not checked.
@@ -317,7 +317,7 @@ function localist_pane_edit_form_submit(&$form, &$form_state) {
 }
 
 function localist_pane_render($subtype, $conf, $panel_args, $context) {
-  $src_url = "http://events.uiowa.edu/widget/view?schools=iowa&style=none&html_descriptions=1";
+  $src_url = "https://events.uiowa.edu/widget/view?schools=iowa&style=none&html_descriptions=1";
 
   $localist_args = array(
     "num",
@@ -390,7 +390,7 @@ function localist_pane_render($subtype, $conf, $panel_args, $context) {
 }
 
 function localist_pane_get_places() {
-  $url = "http://events.uiowa.edu/api/2/places?pp=100";
+  $url = "https://events.uiowa.edu/api/2/places?pp=100";
   // Grab the JSON decoded data.
   $results = _localist_pane_decode($url);
   // Get the places array.
@@ -404,7 +404,7 @@ function localist_pane_get_places() {
     $results = _localist_pane_decode($url);
     $places_data = array_merge($places_data, $results["places"]);
     $page_number++;
-    $url = "http://events.uiowa.edu/api/2/places?pp=100&page=" . strval($page_number);
+    $url = "https://events.uiowa.edu/api/2/places?pp=100&page=" . strval($page_number);
   }
 
   $select_list_data = array();
@@ -418,7 +418,7 @@ function localist_pane_get_places() {
 
 
 function localist_pane_get_filters() {
-  $url = "http://events.uiowa.edu/api/2/events/filters";
+  $url = "https://events.uiowa.edu/api/2/events/filters";
   $results = _localist_pane_decode($url);
   $query_data = array();
   // Get a handle on each filter grouping (Department, event types, etc.)
